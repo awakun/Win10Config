@@ -7,7 +7,7 @@
      |_____/ \___|\__| /_/    \_\_|_|\__,_|___/\___||___/
 #>                                             
 #This is for the chrome alias since chrome can be in 3 different default locations, so check if it's needed first.
-if (-not (Get-Alias -Name 'chrome'))
+if (-not (Get-Alias -Name 'chrome' -ErrorAction SilentlyContinue))
 {
     #Find chrome, prioritize canary > 64bit > 32bit
     $potentialChromePaths = @($env:LOCALAPPDATA, $env:ProgramFiles, ${env:ProgramFiles(x86)})
@@ -22,7 +22,7 @@ if (-not (Get-Alias -Name 'chrome'))
     }
 }
 
-if (-not (Get-Alias -Name 'note'))
+if (-not (Get-Alias -Name 'note' -ErrorAction SilentlyContinue))
 {
     if (Test-Path -Path "$env:ProgramFiles\Notepad++\notepad++.exe")
     {
@@ -30,7 +30,7 @@ if (-not (Get-Alias -Name 'note'))
     }
 }
 
-if (-not (Get-Alias -Name 'code'))
+if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
 {
     #Logic is here in case I switch back to non-insiders at some point, this should get me the correct exe for alias.
     $codePath = (Get-ChildItem -Path $env:ProgramFiles -Filter "code*.exe" -Recurse -Exclude 'CodeHelper.exe' | Where-Object {$_.FullName -notmatch 'Git'}).FullName
