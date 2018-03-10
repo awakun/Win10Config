@@ -28,7 +28,7 @@ if (-not (Get-Alias -Name 'note' -ErrorAction SilentlyContinue))
     {
         New-Alias -Name 'note' -Value "$env:ProgramFiles\Notepad++\notepad++.exe"
     }
-}
+}0
 
 if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
 {
@@ -54,13 +54,10 @@ Set-PSReadlineOption -BellStyle None
 
 #Prompt customization
 function prompt
-{
-    $global:CurrentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
-    $h, $User = $global:CurrentUser.Name -split '\\'
-    $principal = New-Object System.Security.Principal.WindowsPrincipal($global:CurrentUser)
-  
-    if ($principal.IsInRole("Administrator"))
+{ 
+    if ($host.UI.RawUI.WindowTitle -match 'Administrator')
     { 
+        Write-Host 'AS ADMIN: ' -NoNewLine -ForegroundColor Red
         $host.ui.rawui.WindowTitle = $CurrentUser.Name + ".Administrator Line: " + $host.UI.RawUI.CursorPosition.Y
     }
     else
@@ -68,8 +65,9 @@ function prompt
         $host.ui.rawui.WindowTitle = $CurrentUser.Name + " Line: " + $host.UI.RawUI.CursorPosition.Y
     }
   
-    $promptstring = "PS $User@" + $(Get-Item -Path .\).Name + ">"
-    Write-Host $promptstring -NoNewline -ForegroundColor Cyan
+    Write-Host ('PS {0}@ ' -f $env:UserName) -NoNewline -ForegroundColor Magenta
+    Write-Host ('{0}: ' -f $env:COMPUTERNAME) -NoNewLine -ForegroundColor Green
+    Write-Host ('{0}>' -f $(Get-Item -Path .\).Name) -NoNewLine -ForeGroundColor Cyan
     return " "
 }
 
