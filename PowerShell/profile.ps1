@@ -22,31 +22,42 @@ if (-not (Get-Alias -Name 'chrome' -ErrorAction SilentlyContinue))
     }
 }
 
+# Check for alias
 if (-not (Get-Alias -Name 'note' -ErrorAction SilentlyContinue))
 {
-    if (Test-Path -Path "$env:ProgramFiles\Notepad++\notepad++.exe")
+    # Check for np++
+    if ([IO.File]::Exists("$env:ProgramFiles\Notepad++\notepad++.exe"))
     {
         New-Alias -Name 'note' -Value "$env:ProgramFiles\Notepad++\notepad++.exe"
     }
-}0
+}
 
 if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
 {
-    #Logic is here in case I switch back to non-insiders at some point, this should get me the correct exe for alias.
-    $codePath = (Get-ChildItem -Path $env:ProgramFiles -Filter "code*.exe" -Recurse -Exclude 'CodeHelper.exe' | Where-Object {$_.FullName -notmatch 'Git'}).FullName
-    if (Test-Path -Path $codePath)
+    $codePath = (Get-ChildItem -Path "$env:ProgramFiles\Microsoft VS Code Insiders" -Filter "code*.exe")
+    if ([IO.File]::Exists($codePath.Fullname))
     {
-        New-Alias -Name 'code' -Value $codePath
+        New-Alias -Name 'code' -Value $codePath.FullName
     }
 }
+
+if ($IsCoreCLR)
+{
+    if (-not (Get-Alias -Name 'scb' -ErrorAction SilentlyContinue)) { New-Alias -Name 'scb' -Value Set-ClipboardText }
+}
+
+function Update-Path {
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
+
 
 #Shortcuts to common folders
 $docs = "$([System.Environment]::GetFolderPath('mydocuments'))"
 $downloads = "$HOME\Downloads"
 $workspace = "$([System.Environment]::GetFolderPath('mydocuments'))\workspace"
 
-#Get rid of backspace beep
-Set-PSReadlineOption -BellStyle None
+#Get rid of backspace beep maybe Not needed now? leaving for now just commenting out
+#Set-PSReadlineOption -BellStyle None 
 
 #Set useful variables
 #$WinHome = '/mnt/c/Users/worge'
@@ -65,9 +76,10 @@ function prompt
         $host.ui.rawui.WindowTitle = $CurrentUser.Name + " Line: " + $host.UI.RawUI.CursorPosition.Y
     }
   
-    Write-Host ('PS {0}@ ' -f $env:UserName) -NoNewline -ForegroundColor Magenta
+    Write-Host "PS $($PSVersionTable.PSVersion) " -NoNewline -ForegroundColor DarkBlue
+    Write-Host "$env:UserName@ " -ForegroundColor DarkMagenta -NoNewline
     Write-Host ('{0}: ' -f $env:COMPUTERNAME) -NoNewLine -ForegroundColor Green
-    Write-Host ('{0}>' -f $(Get-Item -Path .\).Name) -NoNewLine -ForeGroundColor Cyan
+    Write-Host ('{0}>' -f $(Get-Item -Path .\).Name) -NoNewLine -ForeGroundColor DarkCyan
     return " "
 }
 

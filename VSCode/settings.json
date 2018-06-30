@@ -1,0 +1,43 @@
+{
+    "workbench.iconTheme": "vscode-icons",
+    "shellLauncher.shells.windows": [
+        {
+            "shell": "C:\\Windows\\sysnative\\cmd.exe",
+            "label": "cmd"
+        },
+        {
+            "shell": "C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "label": "PowerShell"
+        },
+        {
+            "shell": "C:\\Program Files\\Git\\bin\\bash.exe",
+            "label": "Git bash"
+        },
+        {
+            "shell": "C:\\Windows\\System32\\bash.exe",
+            "label": "Ubuntu Bash"
+        },
+        {
+            "shell": "C:\\Program Files\\Powershell\\6-preview\\pwsh.exe",
+            "label": "pwsh 6"
+        }
+    ],
+    "powershell.codeFormatting.preset": "Allman",
+    "git.confirmSync": false,
+    "gitlens.keymap": "chorded",
+    "gitlens.advanced.messages": {
+        "suppressCommitHasNoPreviousCommitWarning": false,
+        "suppressCommitNotFoundWarning": false,
+        "suppressFileNotUnderSourceControlWarning": false,
+        "suppressGitVersionWarning": false,
+        "suppressLineUncommittedWarning": false,
+        "suppressNoRepositoryWarning": false,
+        "suppressResultsExplorerNotice": false,
+        "suppressShowKeyBindingsNotice": true
+    },
+    "window.zoomLevel": 0,
+    "gitlens.historyExplorer.enabled": true,
+    "terminal.integrated.rendererType": "dom",
+    "editor.renderWhitespace": "all",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Powershell\\6-preview\\pwsh.exe"
+}
