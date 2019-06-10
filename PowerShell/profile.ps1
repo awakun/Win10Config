@@ -1,40 +1,46 @@
-<#
-       _____      _              _ _                     
-      / ____|    | |       /\   | (_)                    
-     | (___   ___| |_     /  \  | |_  __ _ ___  ___  ___ 
-      \___ \ / _ \ __|   / /\ \ | | |/ _` / __|/ _ \/ __|
-      ____) |  __/ |_   / ____ \| | | (_| \__ \  __/\__ \
-     |_____/ \___|\__| /_/    \_\_|_|\__,_|___/\___||___/
-#>                                             
-#This is for the chrome alias since chrome can be in 3 different default locations, so check if it's needed first.
-if (-not (Get-Alias -Name 'chrome' -ErrorAction SilentlyContinue))
+#region ModuleImports
+try 
 {
-    #Find chrome, prioritize canary > 64bit > 32bit
-    $potentialChromePaths = @($env:LOCALAPPDATA, $env:ProgramFiles, ${env:ProgramFiles(x86)})
-    foreach ($path in $potentialChromePaths)
-    {
-        $chromePath = (Get-ChildItem -Path $path -Filter 'chrome.exe' -Recurse -ErrorAction SilentlyContinue).FullName
-        if ($chromePath) 
-        {
-            New-Alias -name 'chrome' -Value $chromePath
-            break
-        }
-    }
+    Import-Module -Name posh-git -ErrorAction Stop
+}
+catch
+{
+    Write-Warning -Message 'Could not import posh-git'
 }
 
-# Check for alias
-if (-not (Get-Alias -Name 'note' -ErrorAction SilentlyContinue))
+if ($Host.Name -eq 'Visual Studio Code Host')
 {
-    # Check for np++
-    if ([IO.File]::Exists("$env:ProgramFiles\Notepad++\notepad++.exe"))
+    try
     {
-        New-Alias -Name 'note' -Value "$env:ProgramFiles\Notepad++\notepad++.exe"
+        if ($IsCoreCLR)
+        {
+            Import-WinModule -Name EditorServicesCommandSuite -ErrorAction Stop
+            Import-EditorCommand -Module EditorServicesCommandSuite -ErrorAction Stop
+            Write-Host 'EditorServicesCommandSuite loaded.' -ForeGroundColor Green
+        }
+        else
+        {
+            Import-Module -Name EditorServicesCommandSuite -ErrorAction Stop
+            Import-EditorCommand -Module EditorServicesCommandSuite -ErrorAction Stop
+            Write-Host 'EditorServicesCommandSuite loaded.' -ForeGroundColor Green
+        }
     }
+    catch
+    {
+        Write-Host 'EditorServicesCommandSuite could not be loaded!' -ForegroundColor Red
+    }
+}
+#endregion ModuleImports
+
+#region Aliases                                         
+if (-not (Get-Command -Name 'firefox' -ErrorAction SilentlyContinue) -and -not (Get-Alias -Name 'firefox' -ErrorAction SilentlyContinue))
+{
+    New-Alias -Name 'firefox' -Value "$env:ProgramFiles\Mozilla Firefox\firefox.exe"
 }
 
 if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
 {
-    $codePath = (Get-ChildItem -Path "$env:ProgramFiles\Microsoft VS Code Insiders" -Filter "code*.exe")
+    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Microsoft VS Code Insiders" -Filter "code*.exe" -ErrorAction SilentlyContinue)
     if ([IO.File]::Exists($codePath.Fullname))
     {
         New-Alias -Name 'code' -Value $codePath.FullName
@@ -43,27 +49,65 @@ if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
 
 if ($IsCoreCLR)
 {
-    if (-not (Get-Alias -Name 'scb' -ErrorAction SilentlyContinue)) { New-Alias -Name 'scb' -Value Set-ClipboardText }
+    if (-not (Get-Alias -Name 'scb' -ErrorAction SilentlyContinue)) 
+    {
+        New-Alias -Name 'scb' -Value Set-ClipboardText
+    }
+}
+#endregion Aliases
+
+#region CustomFunctions
+function Update-Path
+{
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+}
+#endregion CustomFunctions
+
+#region FolderVars
+if ($IsLinux)
+{
+    $otherHome = '/mnt/c/Users/worge'
+    $docs = [System.IO.Path]::Combine($winHome, 'OneDrive', 'Documents')
+    $downloads = [System.IO.Path]::Combine($winHome, 'Downloads')
+    $workspace = [System.IO.Path]::Combine($docs, 'workspace')
+}
+elseif ($IsWindows -or ($PSEdition -eq 'Desktop'))
+{
+    # If a different distro starts being used this needs to be updated
+    $ubuntuPackageName = (get-apppackage | Where-Object Name -like '*ubuntu18.04*').packagefamilyname
+    $otherHome = "$env:LocalAppData\Packages\$ubuntuPackageName\LocalState\rootfs\home\dave"
+    $docs = [System.Environment]::GetFolderPath('mydocuments')
+    $downloads = [System.IO.Path]::Combine([System.Environment]::GetFolderPath('userprofile'), 'Downloads')
+    $workspace = [System.IO.Path]::Combine($docs, 'workspace')
+}
+else
+{
+    Write-Warning -Message 'Could not set FolderVars, are you running on a Mac?!'
 }
 
-function Update-Path {
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+# Write a friendly message to console to remind me (and warn if there's a problem)
+if ([System.IO.Directory]::Exists($otherHome) -and
+    [System.IO.Directory]::Exists($docs) -and
+    [System.IO.Directory]::Exists($downloads) -and
+    [System.IO.Directory]::Exists($workspace))
+{
+    Write-Host 'Variables $otherHome, $docs, $downloads, and $workspace loaded for your convenience.' -ForegroundColor Green
 }
+else
+{
+    Write-Host 'One or more of the variables $otherHome, $docs, $downloads, and $workspace could not be loaded, check paths!' -ForegroundColor Red
+}
+#endregion FolderVars
 
+#region Preferences
+$ProgressPreference = 'SilentlyContinue'
 
-#Shortcuts to common folders
-$docs = "$([System.Environment]::GetFolderPath('mydocuments'))"
-$downloads = "$HOME\Downloads"
-$workspace = "$([System.Environment]::GetFolderPath('mydocuments'))\workspace"
+# Modifies up/down functionality to work with search history
+Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+#endregion Preferences
 
-#Get rid of backspace beep maybe Not needed now? leaving for now just commenting out
-#Set-PSReadlineOption -BellStyle None 
-
-#Set useful variables
-#$WinHome = '/mnt/c/Users/worge'
-#$BashHome = "C:\Users\worge\AppData\Local\lxss\home\Awakun"
-
-#Prompt customization
+#region Prompt
 function prompt
 { 
     if ($host.UI.RawUI.WindowTitle -match 'Administrator')
@@ -75,23 +119,12 @@ function prompt
     { 
         $host.ui.rawui.WindowTitle = $CurrentUser.Name + " Line: " + $host.UI.RawUI.CursorPosition.Y
     }
-  
+
     Write-Host "PS $($PSVersionTable.PSVersion) " -NoNewline -ForegroundColor DarkBlue
     Write-Host "$env:UserName@ " -ForegroundColor DarkMagenta -NoNewline
     Write-Host ('{0}: ' -f $env:COMPUTERNAME) -NoNewLine -ForegroundColor Green
     Write-Host ('{0}>' -f $(Get-Item -Path .\).Name) -NoNewLine -ForeGroundColor DarkCyan
+    Write-VcsStatus
     return " "
 }
-
-# Start a transcript
-#
-if (!(Test-Path "$Env:USERPROFILE\Documents\WindowsPowerShell\Transcripts"))
-{
-    if (!(Test-Path "$Env:USERPROFILE\Documents\WindowsPowerShell"))
-    {
-        $rc = New-Item -Path "$Env:USERPROFILE\Documents\WindowsPowerShell" -ItemType directory
-    }
-    $rc = New-Item -Path "$Env:USERPROFILE\Documents\WindowsPowerShell\Transcripts" -ItemType directory
-}
-$curdate = $(get-date -Format "yyyyMMddhhmmss")
-Start-Transcript -Path "$Env:USERPROFILE\Documents\WindowsPowerShell\Transcripts\PowerShell_transcript.$curdate.txt"
+#endregion Prompt
