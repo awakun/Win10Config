@@ -38,9 +38,9 @@ if (-not (Get-Command -Name 'firefox' -ErrorAction SilentlyContinue) -and -not (
     New-Alias -Name 'firefox' -Value "$env:ProgramFiles\Mozilla Firefox\firefox.exe"
 }
 
-if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue))
+if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue) -and -not (Get-Command -Name 'code.cmd' -ErrorAction SilentlyContinue))
 {
-    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Microsoft VS Code Insiders" -Filter "code*.exe" -ErrorAction SilentlyContinue)
+    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Microsoft VS Code Insiders" -Filter "code*.cmd" -ErrorAction SilentlyContinue)
     if ([IO.File]::Exists($codePath.Fullname))
     {
         New-Alias -Name 'code' -Value $codePath.FullName
@@ -67,8 +67,8 @@ function Update-Path
 if ($IsLinux)
 {
     $otherHome = '/mnt/c/Users/worge'
-    $docs = [System.IO.Path]::Combine($winHome, 'OneDrive', 'Documents')
-    $downloads = [System.IO.Path]::Combine($winHome, 'Downloads')
+    $docs = [System.IO.Path]::Combine($otherHome, 'OneDrive', 'Documents')
+    $downloads = [System.IO.Path]::Combine($otherHome, 'Downloads')
     $workspace = [System.IO.Path]::Combine($docs, 'workspace')
 }
 elseif ($IsWindows -or ($PSEdition -eq 'Desktop'))
