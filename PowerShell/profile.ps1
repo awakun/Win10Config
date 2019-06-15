@@ -28,6 +28,7 @@ if ($Host.Name -eq 'Visual Studio Code Host')
     catch
     {
         Write-Host 'EditorServicesCommandSuite could not be loaded!' -ForegroundColor Red
+        $proError = $_
     }
 }
 #endregion ModuleImports
@@ -40,7 +41,7 @@ if (-not (Get-Command -Name 'firefox' -ErrorAction SilentlyContinue) -and -not (
 
 if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue) -and -not (Get-Command -Name 'code.cmd' -ErrorAction SilentlyContinue))
 {
-    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Microsoft VS Code Insiders" -Filter "code*.cmd" -ErrorAction SilentlyContinue)
+    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin" -Filter "code*.cmd" -ErrorAction SilentlyContinue)
     if ([IO.File]::Exists($codePath.Fullname))
     {
         New-Alias -Name 'code' -Value $codePath.FullName
@@ -75,7 +76,7 @@ elseif ($IsWindows -or ($PSEdition -eq 'Desktop'))
 {
     # If a different distro starts being used this needs to be updated
     $ubuntuPackageName = (get-apppackage | Where-Object Name -like '*ubuntu18.04*').packagefamilyname
-    $otherHome = "$env:LocalAppData\Packages\$ubuntuPackageName\LocalState\rootfs\home\dave"
+    # $otherHome = "$env:LocalAppData\Packages\$ubuntuPackageName\LocalState\rootfs\home\dave"
     $docs = [System.Environment]::GetFolderPath('mydocuments')
     $downloads = [System.IO.Path]::Combine([System.Environment]::GetFolderPath('userprofile'), 'Downloads')
     $workspace = [System.IO.Path]::Combine($docs, 'workspace')
@@ -86,12 +87,12 @@ else
 }
 
 # Write a friendly message to console to remind me (and warn if there's a problem)
-if ([System.IO.Directory]::Exists($otherHome) -and
+if (#[System.IO.Directory]::Exists($otherHome) -and
     [System.IO.Directory]::Exists($docs) -and
     [System.IO.Directory]::Exists($downloads) -and
     [System.IO.Directory]::Exists($workspace))
 {
-    Write-Host 'Variables $otherHome, $docs, $downloads, and $workspace loaded for your convenience.' -ForegroundColor Green
+    Write-Host 'Variables $docs, $downloads, and $workspace loaded for your convenience.' -ForegroundColor Green
 }
 else
 {
