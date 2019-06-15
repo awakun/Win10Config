@@ -1,5 +1,4 @@
 {
-    "workbench.iconTheme": "vscode-icons",
     "shellLauncher.shells.windows": [
         {
             "shell": "C:\\Windows\\sysnative\\cmd.exe",
@@ -18,7 +17,7 @@
             "label": "Ubuntu Bash"
         },
         {
-            "shell": "C:\\Program Files\\Powershell\\6-preview\\pwsh.exe",
+            "shell": "C:\\Program Files\\Powershell\\6\\pwsh.exe",
             "label": "pwsh 6"
         }
     ],
@@ -35,9 +34,31 @@
         "suppressResultsExplorerNotice": false,
         "suppressShowKeyBindingsNotice": true
     },
-    "window.zoomLevel": 0,
-    "gitlens.historyExplorer.enabled": true,
+    "window.zoomLevel": 1,
     "terminal.integrated.rendererType": "dom",
     "editor.renderWhitespace": "all",
-    "terminal.integrated.shell.windows": "C:\\Program Files\\Powershell\\6-preview\\pwsh.exe"
+    "terminal.integrated.shell.windows": "C:\\Program Files\\Powershell\\7-preview\\pwsh.exe",
+    "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
+    "workbench.colorTheme": "Dark+ Material",
+    "files.defaultLanguage": "powershell",
+    "gitlens.views.fileHistory.enabled": true,
+    "gitlens.views.lineHistory.enabled": true,
+    "yaml.customTags": [
+        "!Equals sequence",
+        "!FindInMap sequence",
+        "!GetAtt",
+        "!GetAZs",
+        "!ImportValue",
+        "!Join sequence",
+        "!Ref",
+        "!Select sequence",
+        "!Split sequence",
+        "!Sub"
+    ],
+    "csharp.format.enable": false,
+    "powershell.developer.featureFlags": [
+        "PSReadLine"
+    ],
+    "workbench.iconTheme": "vscode-icons",
+    "extensions.ignoreRecommendations": false
 }

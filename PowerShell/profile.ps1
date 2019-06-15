@@ -57,13 +57,6 @@ if ($IsCoreCLR)
 }
 #endregion Aliases
 
-#region CustomFunctions
-function Update-Path
-{
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
-#endregion CustomFunctions
-
 #region FolderVars
 if ($IsLinux)
 {
@@ -99,6 +92,55 @@ else
     Write-Host 'One or more of the variables $otherHome, $docs, $downloads, and $workspace could not be loaded, check paths!' -ForegroundColor Red
 }
 #endregion FolderVars
+
+#region CustomFunctions
+function Update-Path
+{
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+}
+
+# Update personal modules in userspace
+function Update-PersonalModule
+{
+    $modules = Get-Module -ListAvailable | Where-Object ModuleBase -like "$docs\PowerShell\Modules\*" | Select-Object -ExpandProperty Name -Unique
+    
+    foreach ($m in $modules)
+    {
+        try
+        {
+            Update-Module -Name $m -ErrorAction Stop
+            Write-Host "Successfully updated $m" -ForegroundColor Green
+        }
+        catch
+        {
+            $needError = $true
+            
+            switch -Wildcard ($_.Exception) {
+                '*Install-Module*' 
+                {
+                    try
+                    {
+                        Install-Module -Name $m -Scope CurrentUser -Force -ErrorAction Stop
+                        Write-Host "Successfully updated $m by installing it again." -ForegroundColor Green
+                        $needError = $false
+                    }
+                    catch
+                    {
+                        Write-Host "Couldn't update $m by installing it, probably already up to date." -ForegroundColor Yellow
+                        $needError = $false
+                    }
+                }
+                Default {}
+            }
+        
+            if ($needError)
+            {
+                Write-Host "Couldn't Update $m. Check output." -ForegroundColor Red
+            }
+        }
+    }
+}
+#endregion CustomFunctions
 
 #region Preferences
 $ProgressPreference = 'SilentlyContinue'

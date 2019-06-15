@@ -1,0 +1,12 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+    {
+        "key": "alt+`",
+        "command": "shellLauncher.launch"
+    },
+    {
+        "key": "ctrl+shift+c",
+        "command": "PowerShell.ShowAdditionalCommands",
+        "when": "editorLangId == 'powershell'"
+    },
+]
