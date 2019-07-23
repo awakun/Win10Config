@@ -1,5 +1,15 @@
-// Place your key bindings in this file to overwrite the defaults
+// Place your key bindings in this file to override the defaults
 [
+    {
+        "key": "f8",
+        "command": "-PowerShell.RunSelection",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+    },
+    {
+        "key": "f8",
+        "command": "workbench.action.terminal.runSelectedText",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+    },
     {
         "key": "alt+`",
         "command": "shellLauncher.launch"
@@ -8,5 +18,5 @@
         "key": "ctrl+shift+c",
         "command": "PowerShell.ShowAdditionalCommands",
         "when": "editorLangId == 'powershell'"
-    },
+    }
 ]
