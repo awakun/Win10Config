@@ -41,11 +41,7 @@ if (-not (Get-Command -Name 'firefox' -ErrorAction SilentlyContinue) -and -not (
 
 if (-not (Get-Alias -Name 'code' -ErrorAction SilentlyContinue) -and -not (Get-Command -Name 'code.cmd' -ErrorAction SilentlyContinue))
 {
-    $codePath = (Get-ChildItem -Path "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin" -Filter "code*.cmd" -ErrorAction SilentlyContinue)
-    if ([IO.File]::Exists($codePath.Fullname))
-    {
-        New-Alias -Name 'code' -Value $codePath.FullName
-    }
+    New-Alias -Name 'code' -Value 'code-insiders.cmd' -ErrorAction SilentlyContinue
 }
 
 if ($IsCoreCLR)
@@ -60,16 +56,13 @@ if ($IsCoreCLR)
 #region FolderVars
 if ($IsLinux)
 {
-    $otherHome = '/mnt/c/Users/worge'
-    $docs = [System.IO.Path]::Combine($otherHome, 'OneDrive', 'Documents')
-    $downloads = [System.IO.Path]::Combine($otherHome, 'Downloads')
+    $winHome = '/mnt/c/Users/worge'
+    $docs = [System.IO.Path]::Combine($winHome, 'OneDrive', 'Documents')
+    $downloads = [System.IO.Path]::Combine($winHome, 'Downloads')
     $workspace = [System.IO.Path]::Combine($docs, 'workspace')
 }
 elseif ($IsWindows -or ($PSEdition -eq 'Desktop'))
 {
-    # If a different distro starts being used this needs to be updated
-    $ubuntuPackageName = (get-apppackage | Where-Object Name -like '*ubuntu18.04*').packagefamilyname
-    # $otherHome = "$env:LocalAppData\Packages\$ubuntuPackageName\LocalState\rootfs\home\dave"
     $docs = [System.Environment]::GetFolderPath('mydocuments')
     $downloads = [System.IO.Path]::Combine([System.Environment]::GetFolderPath('userprofile'), 'Downloads')
     $workspace = [System.IO.Path]::Combine($docs, 'workspace')
@@ -80,8 +73,7 @@ else
 }
 
 # Write a friendly message to console to remind me (and warn if there's a problem)
-if (#[System.IO.Directory]::Exists($otherHome) -and
-    [System.IO.Directory]::Exists($docs) -and
+if ([System.IO.Directory]::Exists($docs) -and
     [System.IO.Directory]::Exists($downloads) -and
     [System.IO.Directory]::Exists($workspace))
 {
@@ -89,16 +81,11 @@ if (#[System.IO.Directory]::Exists($otherHome) -and
 }
 else
 {
-    Write-Host 'One or more of the variables $otherHome, $docs, $downloads, and $workspace could not be loaded, check paths!' -ForegroundColor Red
+    Write-Host 'One or more of the variables $docs, $downloads, and $workspace could not be loaded, check paths!' -ForegroundColor Red
 }
 #endregion FolderVars
 
 #region CustomFunctions
-function Update-Path
-{
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
-
 # Update personal modules in userspace
 function Update-PersonalModule
 {
