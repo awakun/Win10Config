@@ -60,5 +60,8 @@
         "PSReadLine"
     ],
     "workbench.iconTheme": "vscode-icons",
-    "extensions.ignoreRecommendations": false
+    "extensions.ignoreRecommendations": false,
+    "terminal.explorerKind": "external",
+    "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
+    "editor.fontFamily": "'Fira Code',Consolas, 'Courier New', monospace"
 }
