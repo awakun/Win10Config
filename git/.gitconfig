@@ -1,0 +1,22 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = Dave Kaylor
+	email = worgenftw@gmail.com
+[color]
+	ui = auto
+[core]
+	autocrlf = true
+	whitespace = cr-at-eol
+	editor = code --wait
+[push]
+	default = simple
+[alias]
+	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+[diff]
+	tool = vscode
+[difftool]
+	prompt = false
+[difftool "vscode"]
+	cmd = \"C:\\Users\\kaylorw\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" \"$LOCAL\" \"$REMOTE\" --diff --wait
+	trustExitCode = false
